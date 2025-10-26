@@ -1,15 +1,16 @@
-const express = require("express");
-const {
-  addExpense,
-  getExpenses,
-} = require("../controllers/expenseController");
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/db");
+const User = require("./User");
 
-const router = express.Router();
+const Expense = sequelize.define("Expense", {
+  amount: { type: DataTypes.FLOAT, allowNull: false },
+  description: { type: DataTypes.STRING, allowNull: false },
+  category: { type: DataTypes.STRING, allowNull: false },
+  userId: { type: DataTypes.INTEGER, allowNull: false },
+});
 
-// Add new expense
-router.post("/add-expense", addExpense);
+// Relationships
+User.hasMany(Expense, { foreignKey: "userId" });
+Expense.belongsTo(User, { foreignKey: "userId" });
 
-// Get all expenses for user
-router.get("/get-expenses/:userId", getExpenses);
-
-module.exports = router;
+module.exports = Expense;

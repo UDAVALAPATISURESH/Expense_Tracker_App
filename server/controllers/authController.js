@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
-const User = require("../models/User");
-
+// const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const { User } = require("../models"); 
 exports.signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -36,7 +37,14 @@ exports.login = async (req, res) => {
     }
 
     // Optionally return token (for now just send success)
-    res.status(200).json({ message: "Login successful" });
+    res.status(200).json({
+      message: "Login successful",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
+       });
 
   } catch (error) {
     console.error("Login error:", error);

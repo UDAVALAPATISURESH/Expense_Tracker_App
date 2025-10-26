@@ -1,6 +1,7 @@
 const form = document.getElementById("loginForm");
 const message = document.getElementById("message");
 
+// ---------- LOGIN HANDLER ----------
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -19,21 +20,22 @@ form.addEventListener("submit", async (e) => {
     const data = await res.json();
 
     if (res.status === 200) {
-      // Login successful
       message.textContent = "Login successful!";
       message.style.color = "green";
 
-      // Optional: store token if backend returns one
+      // ✅ Save userId and token
+      if (data.user && data.user.id) {
+        localStorage.setItem("userId", data.user.id);
+      }
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
 
-      // Redirect to dashboard after 1 second
+      // Redirect after success
       setTimeout(() => {
         window.location.href = "dashboard.html";
       }, 1000);
     } else {
-      // Login failed (wrong credentials or other message)
       message.textContent = data.message || "Login failed";
       message.style.color = "red";
     }
@@ -41,5 +43,36 @@ form.addEventListener("submit", async (e) => {
     console.error("Error during login:", error);
     message.textContent = "Something went wrong";
     message.style.color = "red";
+  }
+});
+
+// ---------- FORGOT PASSWORD HANDLERS ----------
+
+// Show forgot password form
+const forgotBtn = document.getElementById("forgotPasswordBtn");
+const forgotFormContainer = document.getElementById("forgotPasswordFormContainer");
+const forgotForm = document.getElementById("forgotPasswordForm");
+
+forgotBtn.addEventListener("click", () => {
+  forgotFormContainer.style.display = "block";
+});
+
+// Handle forgot password form submission
+forgotForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById("forgotEmail").value;
+  if (!email) {
+    alert("Please enter your email");
+    return;
+  }
+
+  try {
+    const res = await axios.post("http://localhost:5000/password/forgotpassword", { email });
+    alert(res.data.message || "Reset link sent to your email!");
+    forgotFormContainer.style.display = "none";
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong. Please try again.");
   }
 });
